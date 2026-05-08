@@ -17,51 +17,71 @@ module alu_tb;
     integer pass_cnt;
     integer fail_cnt;
 
+    task check_result;
+        input [31:0] expected;
+        input [63:0] op_name;
+        begin
+            #1;
+            if (result === expected) begin
+                $display("[PASS] %-6s | A=%08h B=%08h | Got=%08h", op_name, operand_a, operand_b, result);
+                pass_cnt = pass_cnt + 1;
+            end else begin
+                $display("[FAIL] %-6s | A=%08h B=%08h | Expected=%08h Got=%08h", op_name, operand_a, operand_b, expected, result);
+                fail_cnt = fail_cnt + 1;
+            end
+        end
+    endtask
+
     initial begin
         pass_cnt = 0; fail_cnt = 0;
-        $display("=== ALU Testbench ===");
+        $display("=== ALU Testbench - 10 operations ===");
 
         // ADD
-        alu_sel = 4'b0000; operand_a = 32'd10; operand_b = 32'd20; #10;
-        if (result===32'd30) begin $display("[PASS] ADD"); pass_cnt=pass_cnt+1; end
-        else begin $display("[FAIL] ADD expected 30 got %0d", result); fail_cnt=fail_cnt+1; end
+        alu_sel = 4'b0000;
+        operand_a = 32'd10;       operand_b = 32'd20;       check_result(32'd30,       "ADD");
+        operand_a = 32'hFFFFFFFF; operand_b = 32'd1;        check_result(32'd0,        "ADD");
 
         // SUB
-        alu_sel = 4'b0001; operand_a = 32'd30; operand_b = 32'd10; #10;
-        if (result===32'd20) begin $display("[PASS] SUB"); pass_cnt=pass_cnt+1; end
-        else begin $display("[FAIL] SUB"); fail_cnt=fail_cnt+1; end
+        alu_sel = 4'b0001;
+        operand_a = 32'd30;       operand_b = 32'd10;       check_result(32'd20,       "SUB");
+        operand_a = 32'd10;       operand_b = 32'd30;       check_result(32'hFFFFFFEC, "SUB");
 
         // SLL
-        alu_sel = 4'b0010; operand_a = 32'd1; operand_b = 32'd4; #10;
-        if (result===32'd16) begin $display("[PASS] SLL"); pass_cnt=pass_cnt+1; end
-        else begin $display("[FAIL] SLL"); fail_cnt=fail_cnt+1; end
+        alu_sel = 4'b0010;
+        operand_a = 32'd1;        operand_b = 32'd4;        check_result(32'd16,       "SLL");
 
         // SLT
-        alu_sel = 4'b0011; operand_a = 32'hFFFFFFFF; operand_b = 32'd1; #10;
-        if (result===32'd1) begin $display("[PASS] SLT"); pass_cnt=pass_cnt+1; end
-        else begin $display("[FAIL] SLT"); fail_cnt=fail_cnt+1; end
+        alu_sel = 4'b0011;
+        operand_a = 32'hFFFFFFFF; operand_b = 32'd1;        check_result(32'd1,        "SLT");
+        operand_a = 32'd5;        operand_b = 32'd3;        check_result(32'd0,        "SLT");
 
         // SLTU
-        alu_sel = 4'b0100; operand_a = 32'd1; operand_b = 32'hFFFFFFFF; #10;
-        if (result===32'd1) begin $display("[PASS] SLTU"); pass_cnt=pass_cnt+1; end
-        else begin $display("[FAIL] SLTU"); fail_cnt=fail_cnt+1; end
+        alu_sel = 4'b0100;
+        operand_a = 32'hFFFFFFFF; operand_b = 32'd1;        check_result(32'd0,        "SLTU");
+        operand_a = 32'd1;        operand_b = 32'hFFFFFFFF; check_result(32'd1,        "SLTU");
 
         // XOR
-        alu_sel = 4'b0101; operand_a = 32'hAAAAAAAA; operand_b = 32'h55555555; #10;
-        if (result===32'hFFFFFFFF) begin $display("[PASS] XOR"); pass_cnt=pass_cnt+1; end
-        else begin $display("[FAIL] XOR"); fail_cnt=fail_cnt+1; end
+        alu_sel = 4'b0101;
+        operand_a = 32'hAAAAAAAA; operand_b = 32'h55555555; check_result(32'hFFFFFFFF, "XOR");
 
         // SRL
-        alu_sel = 4'b0110; operand_a = 32'h80000000; operand_b = 32'd1; #10;
-        if (result===32'h40000000) begin $display("[PASS] SRL"); pass_cnt=pass_cnt+1; end
-        else begin $display("[FAIL] SRL"); fail_cnt=fail_cnt+1; end
+        alu_sel = 4'b0110;
+        operand_a = 32'h80000000; operand_b = 32'd1;        check_result(32'h40000000, "SRL");
 
-        // SRA - arithmetic right shift
-        alu_sel = 4'b0111; operand_a = 32'h80000000; operand_b = 32'd1; #10;
-        if (result===32'hC0000000) begin $display("[PASS] SRA"); pass_cnt=pass_cnt+1; end
-        else begin $display("[FAIL] SRA"); fail_cnt=fail_cnt+1; end
+        // SRA
+        alu_sel = 4'b0111;
+        operand_a = 32'h80000000; operand_b = 32'd1;        check_result(32'hC0000000, "SRA");
+        operand_a = 32'hFFFFFFFF; operand_b = 32'd4;        check_result(32'hFFFFFFFF, "SRA");
 
-        $display("PASS: %0d | FAIL: %0d", pass_cnt, fail_cnt);
+        // OR
+        alu_sel = 4'b1000;
+        operand_a = 32'hAAAAAAAA; operand_b = 32'h55555555; check_result(32'hFFFFFFFF, "OR");
+
+        // AND
+        alu_sel = 4'b1001;
+        operand_a = 32'hFFFFFFFF; operand_b = 32'h0F0F0F0F; check_result(32'h0F0F0F0F, "AND");
+
+        $display("\nPASS: %0d | FAIL: %0d", pass_cnt, fail_cnt);
         $stop;
     end
 
