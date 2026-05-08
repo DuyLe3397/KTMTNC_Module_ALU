@@ -1,4 +1,4 @@
-# ALU RISC-V RV32I — Hướng dẫn chạy
+# Cách chạy dự án
 
 ## Yêu cầu
 
@@ -43,18 +43,3 @@ iverilog -o alu_sim alu.v alu_tb.v
 ```bash
 vvp alu_sim
 ```
-
-## Các phép tính
-
-| alu_sel | Phép tính | Mô tả                        |
-| ------- | --------- | ---------------------------- |
-| `0000`  | ADD       | rs1 + rs2                    |
-| `0001`  | SUB       | rs1 - rs2                    |
-| `0010`  | SLL       | rs1 << rs2[4:0]              |
-| `0011`  | SLT       | (rs1 < rs2) signed ? 1 : 0   |
-| `0100`  | SLTU      | (rs1 < rs2) unsigned ? 1 : 0 |
-| `0101`  | XOR       | rs1 ^ rs2                    |
-| `0110`  | SRL       | rs1 >> rs2[4:0] (zero-fill)  |
-| `0111`  | SRA       | rs1 >>> rs2[4:0] (sign-fill) |
-| `1000`  | OR        | rs1 \| rs2                   |
-| `1001`  | AND       | rs1 & rs2                    |
