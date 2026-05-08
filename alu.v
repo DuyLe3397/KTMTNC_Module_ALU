@@ -1,13 +1,13 @@
 // ============================================================
 // Module : alu
-// Project: RISC-V Processor (Module ALU - EX Stage)
+// Project: KTMTNC - RISC-V Processor (Module ALU - EX Stage)
 // ============================================================
 `timescale 1ns / 1ps
 
 module alu (
-    input  wire [3:0]  alu_sel,    // Operation select
-    input  wire [31:0] operand_a,  // First operand
-    input  wire [31:0] operand_b,  // Second operand
+    input  wire [3:0]  alu_sel,    // Operation select (from ALU controller)
+    input  wire [31:0] operand_a,  // First operand  (from RegFile or PC)
+    input  wire [31:0] operand_b,  // Second operand (from RegFile or Immediate)
     output reg  [31:0] result      // ALU result
 );
 
